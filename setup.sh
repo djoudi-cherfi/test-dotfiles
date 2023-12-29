@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+declare -r GITHUB_REPOSITORY="djoudi-cherfi/test-dotfiles"
 declare -r DOTFILES_UTILS_URL="https://raw.githubusercontent.com/$GITHUB_REPOSITORY/main/src/os/utils.sh"
 
 download() {
@@ -17,7 +18,7 @@ download() {
             "$url" \
                 &> /dev/null
 
-        cat $output
+        # cat $output
         return $?
 
     elif command -v "wget" &> /dev/null; then
@@ -28,7 +29,7 @@ download() {
             "$url" \
                 &> /dev/null
 
-        cat $output
+        # cat $output
         return $?
     fi
 
