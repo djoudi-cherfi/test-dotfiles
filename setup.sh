@@ -17,6 +17,7 @@ download() {
             "$url" \
                 &> /dev/null
 
+        cat $output
         return $?
 
     elif command -v "wget" &> /dev/null; then
@@ -27,6 +28,7 @@ download() {
             "$url" \
                 &> /dev/null
 
+        cat $output
         return $?
     fi
 
@@ -35,7 +37,6 @@ download() {
 }
 
 download_utils() {
-
     local tmpFile=""
 
     tmpFile="$(mktemp /tmp/XXXXX)"
