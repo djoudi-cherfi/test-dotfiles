@@ -18,7 +18,6 @@ download() {
             "$url" \
                 &> /dev/null
 
-        # cat $output
         return $?
 
     elif command -v "wget" &> /dev/null; then
@@ -29,7 +28,6 @@ download() {
             "$url" \
                 &> /dev/null
 
-        # cat $output
         return $?
     fi
 
@@ -51,14 +49,32 @@ download_utils() {
 
 }
 
+function_one() {
+    execute "sleep $1" "$2"
+}
+
+function_two() {
+    execute "ls -lah $1" "$2"
+}
+
+function_three() {
+    myDirectory="00_Directory"
+    mkdir -p "$myDirectory"
+    print_result $? "Create $myDirectory"
+}
+
 main() {
     cd "$(dirname "${BASH_SOURCE[0]}")" || exit 1
 
-    if [ -x "utils.sh" ]; then
-        . "utils.sh" || exit 1
+    if [ -x "src/utils/utils.sh" ]; then
+        . "src/utils/utils.sh" || exit 1
     else
         download_utils || exit 1
     fi
+
+    function_one "3" "Hello world!"
+    function_two "." "John Doe"
+    # function_three
 }
 
 main
