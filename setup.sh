@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 
 declare -r GITHUB_REPOSITORY="djoudi-cherfi/test-dotfiles"
-declare -r DOTFILES_UTILS_URL="https://raw.githubusercontent.com/$GITHUB_REPOSITORY/main/src/os/utils.sh"
+
+declare -r DOTFILES_PRINT_URL="https://raw.githubusercontent.com/$GITHUB_REPOSITORY/main/src/utils/print.sh"
+declare -r DOTFILES_EXECUTE_URL="https://raw.githubusercontent.com/$GITHUB_REPOSITORY/main/src/utils/execute.sh"
+declare -r DOTFILES_PROCESS_URL="https://raw.githubusercontent.com/$GITHUB_REPOSITORY/main/src/utils/process.sh"
+declare -r DOTFILES_SPINNER_URL="https://raw.githubusercontent.com/$GITHUB_REPOSITORY/main/src/utils/spinner.sh"
+declare -r DOTFILES_UTILS_URL="https://raw.githubusercontent.com/$GITHUB_REPOSITORY/main/src/utils/utils.sh"
 
 download() {
 
@@ -36,17 +41,32 @@ download() {
 }
 
 download_utils() {
-    local tmpFile=""
+    local tmpFilePrint=""
+    local tmpFileExecute=""
+    local tmpFileProcess=""
+    local tmpFileSpinner=""
+    local tmpFileUtils=""
 
-    tmpFile="$(mktemp /tmp/XXXXX)"
+    tmpFilePrint="$(mktemp /tmp/print.sh)"
+    tmpFileExecute="$(mktemp /tmp/execute.sh)"
+    tmpFileProcess="$(mktemp /tmp/process.sh)"
+    tmpFileSpinner="$(mktemp /tmp/spinner.sh)"
+    tmpFileUtils="$(mktemp /tmp/utils.sh)"
 
-    download "$DOTFILES_UTILS_URL" "$tmpFile" \
-        && . "$tmpFile" \
-        && rm -rf "$tmpFile" \
+    download "$DOTFILES_PRINT_URL" "$tmpFilePrint" \
+    && download "$DOTFILES_EXECUTE_URL" "$tmpFileExecute" \
+    && download "$DOTFILES_PROCESS_URL" "$tmpFileProcess" \
+    && download "$DOTFILES_SPINNER_URL" "$tmpFileSpinner" \
+    && download "$DOTFILES_UTILS_URL" "$tmpFileUtils" \
+        && . "$tmpFileUtils" \
         && return 0
+        # && rm -rf "$tmpFileUtils" \
+        # && rm -rf "$tmpFileSpinner" \
+        # && rm -rf "$tmpFileProcess" \
+        # && rm -rf "$tmpFileExecute" \
+        # && rm -rf "$tmpFilePrint" \
 
    return 1
-
 }
 
 function_one() {
@@ -65,15 +85,15 @@ function_three() {
 
 main() {
     cd "$(dirname "${BASH_SOURCE[0]}")" || exit 1
+    download_utils || exit 1
+    # if [ -x "src/utils/utils.sh" ]; then
+    #     . "src/utils/utils.sh" || exit 1
+    # else
+    #     download_utils || exit 1
+    # fi
 
-    if [ -x "src/utils/utils.sh" ]; then
-        . "src/utils/utils.sh" || exit 1
-    else
-        download_utils || exit 1
-    fi
-
-    function_one "3" "Hello world!"
-    function_two "." "John Doe"
+    # function_one "3" "Hello world!"
+    # function_two "." "John Doe"
     # function_three
 }
 

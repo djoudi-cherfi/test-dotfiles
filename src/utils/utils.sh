@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
-./print.sh
-./execute.sh
-./process.sh
-./spinner.sh
+cd "$(dirname "${BASH_SOURCE[0]}")" \
+    && . "./print.sh" \
+    && . "./execute.sh" \
+    && . "./process.sh" \
+    && . "./spinner.sh"
 
 echo "Test utils !"
