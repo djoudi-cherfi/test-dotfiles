@@ -116,7 +116,7 @@ download_dotfiles() {
 
     print_in_purple "\n • Download and extract archive\n\n"
 
-    tmpFile="$(mktemp /tmp/dotfiles.sh)"
+    tmpFile="$(mktemp /tmp/XXXXX)"
 
     download "$DOTFILES_TARBALL_URL" "$tmpFile"
     print_result $? "Download archive" "true"
