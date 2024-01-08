@@ -8,6 +8,9 @@ declare -r DOTFILES_UTILS_URL="https://raw.githubusercontent.com/$GITHUB_REPOSIT
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+declare dotfilesDirectory="$HOME/projects/dotfiles"
+declare skipQuestions=false
+
 # ----------------------------------------------------------------------
 # | Helper Functions                                                   |
 # ----------------------------------------------------------------------
@@ -82,7 +85,7 @@ verify_os() {
         if is_supported_version "$os_version" "$MINIMUM_MACOS_VERSION"; then
             return 0
         else
-            printf "Sorry, this script is intended only for macOS %s+" "$MINIMUM_MACOS_VERSION"
+            echo "Sorry, this script is intended only for macOS $MINIMUM_MACOS_VERSION"
         fi
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -95,13 +98,13 @@ verify_os() {
         if is_supported_version "$os_version" "$MINIMUM_UBUNTU_VERSION"; then
             return 0
         else
-            printf "Sorry, this script is intended only for Ubuntu %s+" "$MINIMUM_UBUNTU_VERSION"
+            echo "Sorry, this script is intended only for Ubuntu $MINIMUM_UBUNTU_VERSION"
         fi
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     else
-        printf "Sorry, this script is intended only for macOS and Ubuntu!"
+        echo "Sorry, this script is intended only for macOS and Ubuntu!"
     fi
 
     return 1
@@ -120,7 +123,8 @@ download_dotfiles() {
 
     download "$DOTFILES_TARBALL_URL" "$tmpFile"
     print_result $? "Download archive" "true"
-    printf "\n"
+
+    echo ""
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -152,7 +156,7 @@ download_dotfiles() {
             fi
         done
 
-        printf "\n"
+        echo ""
 
     else
 
@@ -223,11 +227,11 @@ main() {
     # and if not, it most likely means that the dotfiles were not
     # yet set up, and they will need to be downloaded.
 
-    printf "%s" "${BASH_SOURCE[0]}" | grep "setup.sh" &> /dev/null || download_dotfiles
+    echo "${BASH_SOURCE[0]}" | grep "setup.sh" &> /dev/null || download_dotfiles
     
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    # ./create_symbolic_links.sh "$@"
+    ./create_symbolic_links.sh "$@"
 
     # # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

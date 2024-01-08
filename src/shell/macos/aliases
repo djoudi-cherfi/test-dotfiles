@@ -1,0 +1,141 @@
+#!/usr/bin/env bash
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Macos
+
+# =! Faire une fonction show f/i (file ou icon)
+# show/hide hidden files in Finder
+alias sf="defaults write com.apple.finder AppleShowAllFiles -bool "true"; killall Finder"
+alias hf="defaults write com.apple.finder AppleShowAllFiles -bool "false"; killall Finder"
+
+# show/hide desktop icons
+alias si="defaults write com.apple.finder CreateDesktop -bool "true" && killall Finder"
+alias hi="defaults write com.apple.finder CreateDesktop -bool "false" && killall Finder"
+
+# Lock the screen (when going AFK)
+alias afk="osascript -e 'tell application \"System Events\" to keystroke \"q\" using {command down,control down}'"
+# alias afk="osascript -e 'tell application \"System Events\" to sleep'"
+
+# Airport CLI alias
+alias airport='/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport'
+
+# Kill all Browser tabs without closing them to free up memory
+alias bravekill="ps ux | grep '[B]rave Browser Helper (renderer) --type=renderer' | grep -v extension-process | tr -s ' '| cut -d ' ' -f2 | xargs kill"
+alias safarikill="ps ux | grep '[c]om.apple.WebKi' | grep -v extension-process | tr -s ' ' | cut -d ' ' -f2 | xargs kill"
+alias firefoxkill="ps ux | grep '[p]lugin-co' | grep -v extension-process | tr -s ' '| cut -d ' ' -f2 | xargs kill"
+alias chromekill="ps ux | grep '[C]hrome Helper (renderer) --type=renderer' | grep -v extension-process | tr -s ' '| cut -d ' ' -f2 | xargs kill"
+
+# Empty the Trash on all mounted volumes and the main HDD.
+# Also, clear Apple’s System Logs to improve shell startup speed.
+# Finally, clear download history from quarantine. https://mths.be/bum
+alias empty-trash="sudo rm -rfv /Volumes/*/.Trashes; sudo rm -rfv ~/.Trash; sudo rm -rfv /private/var/log/asl/*.asl; sqlite3 ~/Library/Preferences/com.apple.LaunchServices.QuarantineEventsV* 'delete from LSQuarantineEvent'"
+
+# Recursively delete `.DS_Store` files
+alias delete-ds-store="sudo find "${@:-.}" -type f -name .DS_Store -delete"
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Macos : Directorie
+
+alias preferences="cd /Library/Preferences"
+alias fonts="cd /Library/Fonts"
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Macos : File conf
+
+alias p10k-conf="code ${HOME}/.p10k.zsh"
+alias zshrc-conf="code ${HOME}/.zshrc"
+alias aliases-conf="code ${HOME}/.aliases"
+alias functions-conf="code ${HOME}/.functions"
+alias exports-conf="code ${HOME}/.exports"
+alias httpd-conf="code /usr/local/etc/httpd/httpd.conf"
+alias phpini-conf="code /usr/local/etc/php/8.2/php.ini"
+alias xdebug-conf="code /usr/local/etc/php/8.2/conf.d/ext-xdebug.ini"
+alias xdebug-toggle-conf="code ${HOME}/"
+# alias vimrc-conf="code ${HOME}/"
+# alias gitconfig="code ${HOME}/"
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Macos App
+
+# Open from the terminal
+alias finder="o -a 'finder'"
+alias calendrier="o -a 'calendrier'"
+alias mail="o -a 'mail'"
+alias safari="o -a 'safari'"
+alias brave="o -a 'Brave Browser'"
+alias chrome="o -a 'Google Chrome'"
+alias firefox="o -a 'Firefox'"
+alias onyx="o -a 'OnyX'"
+alias bitwarden="o -a 'Bitwarden'"
+alias slack="o -a 'Slack'"
+alias discord="o -a 'Discord'"
+alias text="o -a 'TextEdit'"
+alias spotify="o -a 'Spotify'"
+alias nomachine="o -a 'NoMachine'"
+alias vbox="o -a 'VirtualBox'"
+alias code="o -a 'Visual Studio Code'"
+alias pgadmin="o -a 'pgAdmin 4'"
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Macos : Dev
+
+# brew
+alias bo="brew outdated"
+alias bu="brew update --quiet && brew upgrade && brew cleanup"
+alias bd="brew doctor"
+alias bin="brew install"
+alias bun="brew uninstall"
+alias bs="brew search"
+alias bs="brew services"
+
+# Update applications and CLTs.
+alias u="sudo softwareupdate --install --all && brew update && brew upgrade && brew cleanup"
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Macos : DevOps
+
+# Public ipv6 address
+alias ipv4="dig -4 TXT +short o-o.myaddr.l.google.com @ns1.google.com"
+# Public ipv4 address
+alias ipv6="dig -6 TXT +short o-o.myaddr.l.google.com @ns1.google.com"
+
+# Local ip address (wired connection)
+alias ipen1="ipconfig getifaddr en1"
+# Local ip address (WIFI connection)
+alias ipen0="ipconfig getifaddr en0"
+
+# Show active network interfaces
+alias ips="ifconfig -a | grep -o 'inet6\? \(addr:\)\?\s\?\(\(\([0-9]\+\.\)\{3\}[0-9]\+\)\|[a-fA-F0-9:]\+\)' | awk '{ sub(/inet6? (addr:)? ?/, ""); print }'"
+
+# Show active network interfaces
+alias ifactive="ifconfig | pcregrep -M -o '^[^\t:]+:([^\n]|\n\t)*status: active'"
+
+# Show list of TCP LISTEN processes
+alias tcpl="lsof -nP +c 15 | grep LISTEN"
+
+# Show list of TCP ESTABLISHED processes
+alias tcpe="lsof -nP +c 15 | grep ESTABLISHED"
+
+# Show global processes
+alias tcpu="top -o cpu"
+alias tmem="top -o rsize"
+
+# uuid generator
+alias uuid="uuidgen"
+
+# Decode base64 string
+alias b64="base64 --decode"
+
+# Simple user agent used to send requests to WWW servers and local file system
+for method in GET HEAD POST PUT DELETE TRACE OPTIONS; do
+	alias "${method}"="lwp-request -m '${method}'"
+done
+
+# Clear DNS cache
+alias flush-cache="sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder"

@@ -1,0 +1,178 @@
+#!/usr/bin/env bash
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Navigate
+
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
+alias cd..="cd .."
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Directorie
+
+alias sys="cd /"
+alias home="cd ${HOME}/"
+alias df="cd ${HOME}/dotfiles"
+alias dc="cd ${HOME}/Documents"
+alias dt="cd ${HOME}/Desktop"
+alias dl="cd ${HOME}/Downloads"
+alias vm-data="cd ${HOME}/VirtualBox\ VMs"
+alias docker-data="cd ${HOME}/Docker"
+alias postman-data="cd ${HOME}/Postman"
+alias sites="cd ${HOME}/Sites"
+alias perso="cd ${PROJECTS}/Personal"
+alias work="cd ${PROJECTS}/Work"
+alias usr="cd /usr"
+alias etc="cd /etc"
+alias var="cd /var"
+alias opt="cd /opt"
+alias private="cd /private"
+alias tmp="cd /tmp"
+alias volumes="cd /Volumes"
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Command
+
+# -i : prompt before overwriting an existing file
+# -v : list copied files
+alias cp="cp -iv"
+
+# -i : prompt before overwriting an existing file
+# -v : list moved files
+alias mv="mv -iv"
+
+# -r : Delete a directory and all its contents
+# -i : Request confirmation before attempting to remove each file
+alias rm="rm -ri"
+
+# Always use color output for `ls`
+alias ls="ls ${colorflag} ${groupflag}"
+
+# List all files colorized in long format
+alias ll="ls -l ${colorflag} ${groupflag}"
+
+# List files colorized in long format
+# use unit suffixes: Byte, Kilobyte, Megabyte, Gigabyte, Terabyte and Petabyte
+alias lh="ls -lhF ${colorflag} ${groupflag}"
+
+# List all files colorized in long format, excluding . and ..
+alias la="ls -lAF ${colorflag} ${groupflag}"
+
+# List all files colorized in long format, excluding . and ..
+# use unit suffixes: Byte, Kilobyte, Megabyte, Gigabyte, Terabyte and Petabyte
+# Sort by size (big to small)
+alias lah="ls -lAhFS ${colorflag} ${groupflag}"
+
+# Always enable colored `grep` output
+# Note: `GREP_OPTIONS="--color=auto"` is deprecated, hence the alias usage.
+alias grep="grep -i --color=always"
+alias fgrep="fgrep --color=always"
+alias egrep="egrep --color=always"
+
+# Clear
+alias c="clear"
+alias cls='clear; ls'
+alias clh='clear; lh'
+alias cla='clear; la'
+alias clah='clear; lah'
+
+# history
+alias h="history"
+# clean history
+alias hb="history -c && > ~/.bash_history"
+alias hz="history -p && echo -n > ~/.zsh_history"
+
+# Reload the shell 
+alias reload="exec $SHELL -l"
+
+# Source .zshrc, which updates all other commands
+alias szsh="source ~/.zshrc"
+
+# Print each PATH entry on a separate line
+alias path='printf "%b\n" "${PATH//:/\\n}"'
+
+alias q="exit"
+
+alias m="man"
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Dev
+
+# git
+alias g="git"
+alias gs="g status"
+alias go="g checkout"
+alias ga="g add"
+alias gc="g commit -m"
+alias gp="g push"
+alias gl="g pull"
+
+# docker
+alias dps="docker ps"
+# alias dex="docker exec -it $@ /bin/bash"
+# docker build -t myapp:v1.0 .
+# alias db="docker build -t $@ ."
+alias dil="docker image ls"
+# docker run -tid --name myapp -p 8080:5000 myapp:v1.0
+# alias dr="docker run -tid --name $1 -p $2:$3 $1:$4"
+alias dvp="docker volume prune"
+alias dnp="docker network prune"
+alias dsp="docker system prune"
+alias dk='docker kill $(docker ps -q)'
+alias drm='docker rm -vf $(docker ps -aq)'
+alias drmi='docker rmi -f $(docker images -qa)'
+alias drmv='docker volume rm $(docker volume ls -qf dangling=true)'
+alias drm-all='docker rm -f $(docker ps -aq) && docker rmi -f $(docker images -qa) && docker volume rm $(docker volume ls -qf dangling=true) && docker network prune && docker system prune'
+
+# docker-compose
+alias dcu="docker-compose up -d"
+alias dcd="docker-compose up down"
+alias dcb="docker-compose up -d --build"
+
+# dev container
+alias psql="docker exec -it postgres psql -U postgres"
+alias mongo="docker exec -it mongodb mongo -u admin -p djood"
+
+# npm
+alias n="npm"
+alias nconf="npm config list"
+alias nconfl="npm config list -l"
+alias nconfg="npm config list -g"
+alias nl="npm ls"
+alias nlg="npm ls -g"
+alias no="npm outdated"
+alias nu="npm update"
+alias nun="npm uninstall"
+alias ni="npm install"
+alias nig="npm install -g"
+
+# npm run
+alias nr="npm run"
+alias nrd="npm run dev"
+alias nrs="npm run server"
+alias nrw="npm run watch"
+alias nrb="npm run build"
+alias nrbw="npm run build:watch"
+alias nrt="npm run test"
+alias nrtw="npm run test:watch"
+
+# npm modules
+alias nc="ncu --interactive --format group"
+alias ncg="ncu --interactive --format group -g"
+
+# yarn
+alias y="yarn"
+
+# python
+alias py="python3"
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Load OS specific configs.
+
+. "$OS/aliases"

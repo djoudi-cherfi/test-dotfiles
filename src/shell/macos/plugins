@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+if [ -x "$prefix/opt/neofetch/bin/neofetch" ]; then
+    neofetch
+fi
+
+plugins=("share/zsh-autocomplete/zsh-autocomplete.plugin.zsh" \
+    "share/zsh-autosuggestions/zsh-autosuggestions.zsh" \
+    "share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh")
+
+for plugin in "${plugins[@]}"; do
+    # Check if the file exists
+    if [[ -f "$prefix/$plugin" ]]; then
+        . "$prefix/$plugin"
+    fi
+done

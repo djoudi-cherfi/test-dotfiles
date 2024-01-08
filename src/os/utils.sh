@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------
 
 print_in_color() {
-    printf "\e[$1%b\e[0m" "$2";
+    echo -e "\e[$1$2\e[0m"
 }
 
 print_in_green() {
@@ -54,7 +54,7 @@ ask() {
 ask_for_confirmation() {
     print_question "$1 (y/n) "
     read -r -n 1
-    printf "\n"
+    echo ""
 }
 
 # ----------------------------------------------------------------------
@@ -62,7 +62,7 @@ ask_for_confirmation() {
 # ----------------------------------------------------------------------
 
 get_answer() {
-    printf "%s" "$REPLY"
+    echo "$REPLY"
 }
 
 answer_is_yes() {
@@ -208,14 +208,14 @@ spinner() {
 
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-        printf "%s" "$spin_msg"
+        echo "$spin_msg"
         
         sleep "$delay"
 
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
         # Clear frame text.
-        printf "\r\033[K"
+        echo -e "\r\033[K"
 
     done
     
@@ -238,12 +238,13 @@ get_os() {
         os="macos"
     elif [ "$kernelName" == "Linux" ] && \
          [ -e "/etc/os-release" ]; then
-        os="$(. /etc/os-release; printf "%s" "$ID")"
+        os="$(. /etc/os-release; echo "$ID")"
+
     else
         os="$kernelName"
     fi
 
-    printf "%s" "$os"
+    echo "$os"
 
 }
 
@@ -259,10 +260,10 @@ get_os_version() {
     if [ "$os" == "macos" ]; then
         version="$(sw_vers -productVersion)"
     elif [ -e "/etc/os-release" ]; then
-        version="$(. /etc/os-release; printf "%s" "$VERSION_ID")"
+        version="$(. /etc/os-release; echo "$VERSION_ID")"
     fi
 
-    printf "%s" "$version"
+    echo "$version"
 
 }
 
