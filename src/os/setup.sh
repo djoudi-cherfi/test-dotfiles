@@ -231,7 +231,6 @@ main() {
     
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    chmod +x ./create_symbolic_links.sh
     ./create_symbolic_links.sh "$@"
 
     # # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
