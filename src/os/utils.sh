@@ -130,7 +130,7 @@ execute() {
     
     local -r CMDS="$1"
     local -r MSG="${2:-$1}"
-    local -r TMP_FILE="$(mktemp /tmp/execute.sh)"
+    local -r TMP_FILE="$(mktemp /tmp/XXXXX)"
 
     local exitCode=0
     local cmdsPID=""
@@ -156,7 +156,7 @@ execute() {
     # Show a spinner if the commands
     # require more time to complete.
 
-    show_spinner "$cmdsPID" "$MSG"
+    spinner "$cmdsPID" "$MSG"
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -208,14 +208,14 @@ spinner() {
 
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-        echo "$spin_msg"
+        echo -ne "$spin_msg"
         
         sleep "$delay"
 
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
         # Clear frame text.
-        echo -e "\r\033[K"
+        echo -ne "\r\033[K"
 
     done
     
