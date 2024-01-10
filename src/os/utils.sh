@@ -210,7 +210,7 @@ spinner() {
         # Save cursor position
         tput sc
 
-        echo "$spin_msg"
+        echo -n "$spin_msg"
 
         sleep "$delay"
 
