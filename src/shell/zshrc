@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
 [ -n "$PS1" ] \
-    && . "$HOME/.zshrc"
+    && . "$HOME/.profile"

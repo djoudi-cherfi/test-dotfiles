@@ -14,11 +14,11 @@ create_symlinks() {
         "shell/exports"
         "shell/functions"
         "shell/init"
-        "shell/profile"
         "shell/prompt"
-        "shell/shellrc"
-        "shell/curlrc"
+        "shell/profile"
         "shell/hushlogin"
+        "shell/zshrc"
+        "shell/curlrc"
 
         "git/gitattributes"
         "git/gitconfig"
@@ -44,7 +44,7 @@ create_symlinks() {
     for i in "${FILES_TO_SYMLINK[@]}"; do
 
         sourceFile="$(cd .. && pwd)/$i"
-        targetFile="$HOME/.$(echo "$i" | sed 's|.*/\(.*\)|\1|')"
+        targetFile="$HOME/.$(echo "$i" | sed "s/.*\/\(.*\)/\1/g")"
 
         if [ ! -e "$targetFile" ] || $skipQuestions; then
 

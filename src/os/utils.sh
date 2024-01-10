@@ -204,21 +204,24 @@ spinner() {
 
     while kill -0 "$PID" &>/dev/null; do
 
+        # Build the spinner message
         spin_msg="   [${SPIN:i++%SPIN_LENGTH:1}] $MSG"
 
-        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        # Save cursor position
+        tput sc
 
-        echo -ne "$spin_msg"
-        
+        echo "$spin_msg"
+
         sleep "$delay"
 
-        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        # Restore cursor position
+        tput rc
 
-        # Clear frame text.
-        echo -ne "\r\033[K"
-
+        # Clear the rest of the line
+        tput ed
+        
     done
-    
+
 }
 
 # ----------------------------------------------------------------------
@@ -244,8 +247,6 @@ get_os() {
         os="$kernelName"
     fi
 
-    echo "$os"
-
 }
 
 get_os_version() {
@@ -262,8 +263,6 @@ get_os_version() {
     elif [ -e "/etc/os-release" ]; then
         version="$(. /etc/os-release; echo "$VERSION_ID")"
     fi
-
-    echo "$version"
 
 }
 
