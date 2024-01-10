@@ -54,7 +54,7 @@ ask() {
 ask_for_confirmation() {
     print_question "$1 (y/n) "
     read -r -n 1
-    echo ""
+    echo -ne "\n"
 }
 
 # ----------------------------------------------------------------------
@@ -200,6 +200,15 @@ spinner() {
     local i=0
     local delay=0.2
 
+    # Add 3 lines
+    echo -ne "\n\n\n"
+
+    # Move cursor up 3 lines
+    tput cuu 3
+
+    # Save cursor position
+    tput sc
+
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     while kill -0 "$PID" &>/dev/null; do
@@ -207,18 +216,12 @@ spinner() {
         # Build the spinner message
         spin_msg="   [${SPIN:i++%SPIN_LENGTH:1}] $MSG"
 
-        # Save cursor position
-        tput sc
-
         echo -n "$spin_msg"
 
         sleep "$delay"
 
         # Restore cursor position
         tput rc
-
-        # Clear the rest of the line
-        tput ed
         
     done
 
