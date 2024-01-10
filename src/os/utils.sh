@@ -247,6 +247,8 @@ get_os() {
         os="$kernelName"
     fi
 
+    echo "$os"
+
 }
 
 get_os_version() {
@@ -263,6 +265,8 @@ get_os_version() {
     elif [ -e "/etc/os-release" ]; then
         version="$(. /etc/os-release; echo "$VERSION_ID")"
     fi
+
+    echo "$version"
 
 }
 
