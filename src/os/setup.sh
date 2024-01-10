@@ -215,11 +215,11 @@ main() {
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    # skip_questions "$@" && skipQuestions=true
+    skip_questions "$@" && skipQuestions=true
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    # keep_alive_sudo
+    keep_alive_sudo
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -227,11 +227,11 @@ main() {
     # and if not, it most likely means that the dotfiles were not
     # yet set up, and they will need to be downloaded.
 
-    # echo "${BASH_SOURCE[0]}" | grep "setup.sh" &> /dev/null || download_dotfiles
+    echo "${BASH_SOURCE[0]}" | grep "setup.sh" &> /dev/null || download_dotfiles
     
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    # ./create_symbolic_links.sh "$@"
+    ./create_symbolic_links.sh "$@"
 
     # # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
