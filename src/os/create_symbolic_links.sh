@@ -44,7 +44,7 @@ create_symlinks() {
     for i in "${FILES_TO_SYMLINK[@]}"; do
 
         sourceFile="$(cd .. && pwd)/$i"
-        targetFile="$HOME/.$(echo "$i" | sed "s/.*\/\(.*\)/\1/g")"
+        targetFile="$HOME/.$(printf "%s" "$i" | sed "s/.*\/\(.*\)/\1/g")"
 
         if [ ! -e "$targetFile" ] || $skipQuestions; then
 

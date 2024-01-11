@@ -14,51 +14,52 @@ o() {
 update() {
     # Check if Homebrew is installed
     if ! command -v brew &> /dev/null; then
-        echo "Error: Homebrew is not installed. Please install Homebrew and try again."
+        printf "Error: Homebrew is not installed. Please install Homebrew and try again.\n"
         exit 1
     fi
 
     # Homebrew updates
-    echo "------------------------------------------------------------------------"
-    echo "brew update"
-    echo "------------------------------------------------------------------------"
-    brew update && echo ""
+    printf "\n%s\n" "------------------------------------------------------------------------"
+    printf "• brew update"
+    printf "\n%s\n" "------------------------------------------------------------------------"
+    brew update && printf "\n"
 
-    echo "------------------------------------------------------------------------"
-    echo "brew upgrade"
-    echo "------------------------------------------------------------------------"
-    brew upgrade && echo ""
+    printf "\n%s\n" "------------------------------------------------------------------------"
+    printf "• brew upgrade"
+    printf "\n%s\n" "------------------------------------------------------------------------"
+    brew upgrade && printf "\n"
 
-    echo "------------------------------------------------------------------------"
-    echo "brew cleanup"
-    echo "------------------------------------------------------------------------"
-    brew cleanup && echo ""
+    printf "\n%s\n" "------------------------------------------------------------------------"
+    printf "• brew cleanup"
+    printf "\n%s\n" "------------------------------------------------------------------------"
+    brew cleanup && printf "\n"
 
-    echo "------------------------------------------------------------------------"
-    echo "brew doctor"
-    echo "------------------------------------------------------------------------"
-    brew doctor && echo ""
+    printf "\n%s\n" "------------------------------------------------------------------------"
+    printf "• brew doctor"
+    printf "\n%s\n" "------------------------------------------------------------------------"
+    brew doctor && printf "\n"
 
     # System updates
-    echo "------------------------------------------------------------------------"
-    echo "softwareupdate"
-    echo "------------------------------------------------------------------------"
-    sudo softwareupdate -i -a && echo ""
+    printf "\n%s\n" "------------------------------------------------------------------------"
+    printf "• softwareupdate"
+    printf "\n%s\n" "------------------------------------------------------------------------"
+    sudo softwareupdate -i -a && printf "\n"
 
     # Check if Node.js is installed
     if ! command -v node &> /dev/null; then
-        echo "Error: Node.js is not installed. Please install Node.js and try again."
+        printf "Error: Node.js is not installed. Please install Node.js and try again.\n"
         exit 1
     fi
 
     # Node.js updates
-    echo "------------------------------------------------------------------------"
-    echo "npm install npm@latest -g"
-    echo "------------------------------------------------------------------------"
-    npm install npm@latest -g && echo ""
+    printf "\n%s\n" "------------------------------------------------------------------------"
+    printf "• npm install npm@latest -g"
+    printf "\n%s\n" "------------------------------------------------------------------------"
+    npm install npm@latest -g && printf "\n"
 
-    echo "------------------------------------------------------------------------"
-    echo "npm update -g"
-    echo "------------------------------------------------------------------------"
-    npm update -g && echo ""
+    printf "\n%s\n" "------------------------------------------------------------------------"
+    printf "• npm update -g"
+    printf "\n%s\n" "------------------------------------------------------------------------"
+    npm update -g && printf "\n"
 }
+

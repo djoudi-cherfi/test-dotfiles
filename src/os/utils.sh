@@ -5,31 +5,42 @@
 # ----------------------------------------------------------------------
 
 print_in_color() {
-    echo -e "\033[$1$2\033[0m"
+    printf "%b" \
+        "$(tput setaf "$2" 2> /dev/null)" \
+        "$1" \
+        "$(tput sgr0 2> /dev/null)"
 }
 
 print_in_green() {
-    print_in_color "92m" "$1"
+    print_in_color "$1" 2
 }
 
 print_in_purple() {
-    print_in_color "95m" "$1"
+    print_in_color "$1" 5
 }
 
 print_in_red() {
-    print_in_color "91m" "$1"
+    print_in_color "$1" 1
 }
 
 print_in_yellow() {
-    print_in_color "93m" "$1"
+    print_in_color "$1" 3
 }
 
 # ----------------------------------------------------------------------
 # | Question                                                           |
 # ----------------------------------------------------------------------
 
+print_title() {
+    print_in_purple "\n • $1\n\n"
+}
+
+print_subtitle() {
+    print_in_purple "   $1\n"
+}
+
 print_question() {
-    print_in_yellow "   [?] $1\n"
+    print_in_yellow "   [?] $1"
 }
 
 skip_questions() {
@@ -54,7 +65,7 @@ ask() {
 ask_for_confirmation() {
     print_question "$1 (y/n) "
     read -r -n 1
-    echo -ne "\n"
+    printf "\n"
 }
 
 # ----------------------------------------------------------------------
@@ -62,11 +73,13 @@ ask_for_confirmation() {
 # ----------------------------------------------------------------------
 
 get_answer() {
-    echo "$REPLY"
+    printf "%s" "$REPLY"
 }
 
 answer_is_yes() {
-    [[ "$REPLY" =~ ^[Yy]$ ]] && return 0 || return 1
+    [[ "$REPLY" =~ ^[Yy]$ ]] \
+        && return 0 \
+        || return 1
 }
 
 # ----------------------------------------------------------------------
@@ -78,6 +91,7 @@ print_success() {
 }
 
 print_result() {
+
     if [ "$1" -eq 0 ]; then
         print_success "$2"
     else
@@ -85,6 +99,7 @@ print_result() {
     fi
 
     return "$1"
+
 }
 
 print_warning() {
@@ -118,7 +133,8 @@ kill_all_subprocesses() {
 
 set_trap() {
 
-    trap -p "$1" | grep "$2" &> /dev/null || trap '$2' "$1"
+    trap -p "$1" | grep "$2" &> /dev/null \
+        || trap '$2' "$1"
 
 }
 
@@ -147,7 +163,9 @@ execute() {
     # Execute commands in background
     # shellcheck disable=SC2261
 
-    eval "$CMDS" &> /dev/null 2> "$TMP_FILE" &
+    eval "$CMDS" \
+        &> /dev/null \
+        2> "$TMP_FILE" &
 
     cmdsPID=$!
 
@@ -156,7 +174,7 @@ execute() {
     # Show a spinner if the commands
     # require more time to complete.
 
-    spinner "$cmdsPID" "$MSG"
+    show_spinner "$cmdsPID" "$CMDS" "$MSG"
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -164,7 +182,6 @@ execute() {
     # in the background, and then get their exit code.
 
     wait "$cmdsPID" &> /dev/null
-    
     exitCode=$?
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -189,40 +206,73 @@ execute() {
 # | Spinner                                                            |
 # ----------------------------------------------------------------------
 
-spinner() {
+show_spinner() {
 
-    local -r SPIN='|/-\'
-    local -r SPIN_LENGTH=${#SPIN}
+    local -r FRAMES='/-\|'
 
+    # shellcheck disable=SC2034
+    local -r NUMBER_OR_FRAMES=${#FRAMES}
+
+    local -r CMDS="$2"
+    local -r MSG="$3"
     local -r PID="$1"
-    local -r MSG="$2"
 
     local i=0
-    local delay=0.2
-
-    # Add 3 lines
-    echo -ne "\n\n\n"
-
-    # Move cursor up 3 lines
-    tput cuu 3
-
-    # Save cursor position
-    tput sc
+    local frameText=""
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+    # Note: In order for the Travis CI site to display
+    # things correctly, it needs special treatment, hence,
+    # the "is Travis CI?" checks.
+
+    if [ "$TRAVIS" != "true" ]; then
+
+        # Provide more space so that the text hopefully
+        # doesn't reach the bottom line of the terminal window.
+        #
+        # This is a workaround for escape sequences not tracking
+        # the buffer position (accounting for scrolling).
+        #
+        # See also: https://unix.stackexchange.com/a/278888
+
+        printf "\n\n\n"
+        tput cuu 3
+
+        tput sc
+
+    fi
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    # Display spinner while the commands are being executed.
+
     while kill -0 "$PID" &>/dev/null; do
 
-        # Build the spinner message
-        spin_msg="   [${SPIN:i++%SPIN_LENGTH:1}] $MSG"
+        frameText="   [${FRAMES:i++%NUMBER_OR_FRAMES:1}] $MSG"
 
-        echo -n "$spin_msg"
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-        sleep "$delay"
+        # Print frame text.
 
-        # Restore cursor position
-        tput rc
-        
+        if [ "$TRAVIS" != "true" ]; then
+            printf "%s\n" "$frameText"
+        else
+            printf "%s" "$frameText"
+        fi
+
+        sleep 0.2
+
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+        # Clear frame text.
+
+        if [ "$TRAVIS" != "true" ]; then
+            tput rc
+        else
+            printf "\r"
+        fi
+
     done
 
 }
@@ -244,13 +294,12 @@ get_os() {
         os="macos"
     elif [ "$kernelName" == "Linux" ] && \
          [ -e "/etc/os-release" ]; then
-        os="$(. /etc/os-release; echo "$ID")"
-
+        os="$(. /etc/os-release; printf "%s" "$ID")"
     else
         os="$kernelName"
     fi
 
-    echo "$os"
+    printf "%s" "$os"
 
 }
 
@@ -266,10 +315,10 @@ get_os_version() {
     if [ "$os" == "macos" ]; then
         version="$(sw_vers -productVersion)"
     elif [ -e "/etc/os-release" ]; then
-        version="$(. /etc/os-release; echo "$VERSION_ID")"
+        version="$(. /etc/os-release; printf "%s" "$VERSION_ID")"
     fi
 
-    echo "$version"
+    printf "%s" "$version"
 
 }
 
@@ -312,14 +361,14 @@ cmd_exists() {
     command -v "$1" &> /dev/null
 }
 
-keep_alive_sudo() {
+ask_for_sudo() {
 
     # Ask for the administrator password upfront.
 
     sudo -v &> /dev/null
 
-    # Keep-alive: update `sudo` time stamp
-    # until this`setup.sh` has finished.
+    # Update existing `sudo` time stamp
+    # until this script has finished.
     #
     # https://gist.github.com/cowboy/3118588
 

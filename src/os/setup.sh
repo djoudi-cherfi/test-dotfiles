@@ -22,89 +22,25 @@ download() {
 
     if command -v "curl" &> /dev/null; then
 
-        curl --location --silent --show-error --output "$output" "$url" &> /dev/null
+        curl \
+            --location \
+            --silent \
+            --show-error \
+            --output "$output" \
+            "$url" \
+                &> /dev/null
 
         return $?
 
     elif command -v "wget" &> /dev/null; then
 
-        wget --quiet --output-document="$output" "$url" &> /dev/null
+        wget \
+            --quiet \
+            --output-document="$output" \
+            "$url" \
+                &> /dev/null
 
         return $?
-    fi
-
-    return 1
-
-}
-
-extract() {
-
-    local archive="$1"
-    local outputDir="$2"
-
-    if command -v "tar" &> /dev/null; then
-
-        tar --extract --gzip --file "$archive" --strip-components 1 --directory "$outputDir"
-        return $?
-    fi
-
-    return 1
-
-}
-
-download_utils() {
-
-    local tmpFile=""
-
-    tmpFile="$(mktemp /tmp/XXXXX)"
-
-    download "$DOTFILES_UTILS_URL" "$tmpFile" \
-        && . "$tmpFile" \
-        && rm -rf "$tmpFile" \
-        && return 0
-
-   return 1
-
-}
-
-verify_os() {
-
-    declare -r MINIMUM_MACOS_VERSION="10.10"
-    declare -r MINIMUM_UBUNTU_VERSION="20.04"
-
-    local os_name="$(get_os)"
-    local os_version="$(get_os_version)"
-
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-    # Check if the OS is `macOS` and
-    # it's above the required version.
-
-    if [ "$os_name" == "macos" ]; then
-
-        if is_supported_version "$os_version" "$MINIMUM_MACOS_VERSION"; then
-            return 0
-        else
-            echo "Sorry, this script is intended only for macOS $MINIMUM_MACOS_VERSION"
-        fi
-
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-    # Check if the OS is `Ubuntu` and
-    # it's above the required version.
-
-    elif [ "$os_name" == "ubuntu" ]; then
-
-        if is_supported_version "$os_version" "$MINIMUM_UBUNTU_VERSION"; then
-            return 0
-        else
-            echo "Sorry, this script is intended only for Ubuntu $MINIMUM_UBUNTU_VERSION"
-        fi
-
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-    else
-        echo "Sorry, this script is intended only for macOS and Ubuntu!"
     fi
 
     return 1
@@ -123,8 +59,7 @@ download_dotfiles() {
 
     download "$DOTFILES_TARBALL_URL" "$tmpFile"
     print_result $? "Download archive" "true"
-
-    echo ""
+    printf "\n"
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -156,7 +91,7 @@ download_dotfiles() {
             fi
         done
 
-        echo ""
+        printf "\n"
 
     else
 
@@ -181,7 +116,88 @@ download_dotfiles() {
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    cd "$dotfilesDirectory/src/os" || return 1
+    cd "$dotfilesDirectory/src/os" \
+        || return 1
+
+}
+
+download_utils() {
+
+    local tmpFile=""
+
+    tmpFile="$(mktemp /tmp/XXXXX)"
+
+    download "$DOTFILES_UTILS_URL" "$tmpFile" \
+        && . "$tmpFile" \
+        && rm -rf "$tmpFile" \
+        && return 0
+
+   return 1
+
+}
+
+extract() {
+
+    local archive="$1"
+    local outputDir="$2"
+
+    if command -v "tar" &> /dev/null; then
+
+        tar \
+            --extract \
+            --gzip \
+            --file "$archive" \
+            --strip-components 1 \
+            --directory "$outputDir"
+
+        return $?
+    fi
+
+    return 1
+
+}
+
+verify_os() {
+
+    declare -r MINIMUM_MACOS_VERSION="10.10"
+    declare -r MINIMUM_UBUNTU_VERSION="20.04"
+
+    local os_name="$(get_os)"
+    local os_version="$(get_os_version)"
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    # Check if the OS is `macOS` and
+    # it's above the required version.
+
+    if [ "$os_name" == "macos" ]; then
+
+        if is_supported_version "$os_version" "$MINIMUM_MACOS_VERSION"; then
+            return 0
+        else
+            printf "Sorry, this script is intended only for macOS %s+" "$MINIMUM_MACOS_VERSION"
+        fi
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    # Check if the OS is `Ubuntu` and
+    # it's above the required version.
+
+    elif [ "$os_name" == "ubuntu" ]; then
+
+        if is_supported_version "$os_version" "$MINIMUM_UBUNTU_VERSION"; then
+            return 0
+        else
+            printf "Sorry, this script is intended only for Ubuntu %s+" "$MINIMUM_UBUNTU_VERSION"
+        fi
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    else
+        printf "Sorry, this script is intended only for macOS and Ubuntu!"
+    fi
+
+    return 1
 
 }
 
@@ -193,8 +209,9 @@ main() {
 
     # Ensure that the following actions
     # are made relative to this file's path.
-    
-    cd "$(dirname "${BASH_SOURCE[0]}")" || exit 1
+
+    cd "$(dirname "${BASH_SOURCE[0]}")" \
+        || exit 1
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -211,15 +228,17 @@ main() {
     # Ensure the OS is supported and
     # it's above the required version.
 
-    verify_os || exit 1
+    verify_os \
+        || exit 1
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    skip_questions "$@" && skipQuestions=true
+    skip_questions "$@" \
+        && skipQuestions=true
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    keep_alive_sudo
+    ask_for_sudo
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -227,8 +246,9 @@ main() {
     # and if not, it most likely means that the dotfiles were not
     # yet set up, and they will need to be downloaded.
 
-    echo "${BASH_SOURCE[0]}" | grep "setup.sh" &> /dev/null || download_dotfiles
-    
+    printf "%s" "${BASH_SOURCE[0]}" | grep "setup.sh" &> /dev/null \
+        || download_dotfiles
+
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     ./create_symbolic_links.sh "$@"
