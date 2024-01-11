@@ -29,6 +29,7 @@ source_shell_files() {
 
     # shellcheck disable=SC2034
     declare -r OS="$(get_os)"
+    echo "1 - Voici le dossier $OS pour les fichiers (°_°)"
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -36,8 +37,10 @@ source_shell_files() {
 
         file="$HOME/.${FILES_TO_SOURCE[$i]}"
 
+
         [ -r "$file" ] \
             && . "$file"
+        echo "2 - Voici le fichier $file exécuté (°_°)"
 
     done
 
