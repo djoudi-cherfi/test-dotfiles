@@ -278,6 +278,33 @@ show_spinner() {
 }
 
 # ----------------------------------------------------------------------
+# | Terminal                                                           |
+# ----------------------------------------------------------------------
+
+add_shebang() {
+    local directory="$1"
+    local shebang="$2"
+
+    # Check if the directory exists
+    if [ -d "$directory" ]; then
+
+        # Iterate through files in the directory
+        for file in "$directory"/*; do
+            # Check if it's a file
+            if [ -f "$file" ]; then
+                # Add the shebang at the beginning of the file
+                sed -i "1s|^.*$|${shebang}|" "$file"
+            fi
+        done
+        
+        printf "%s" "$directory"
+
+    else
+        echo "Error: The directory $directory does not exist."
+    fi
+}
+
+# ----------------------------------------------------------------------
 # | OS                                                                 |
 # ----------------------------------------------------------------------
 

@@ -8,7 +8,7 @@ declare -r DOTFILES_UTILS_URL="https://raw.githubusercontent.com/$GITHUB_REPOSIT
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-declare dotfilesDirectory="$HOME/projects/dotfiles"
+declare default_dotfiles_directory="$HOME/projects/dotfiles"
 declare skipQuestions=false
 
 # ----------------------------------------------------------------------
@@ -65,28 +65,28 @@ download_dotfiles() {
 
     if ! $skipQuestions; then
 
-        ask_for_confirmation "Do you want to store the dotfiles in '$dotfilesDirectory'?"
+        ask_for_confirmation "Do you want to store the dotfiles in '$default_dotfiles_directory'?"
 
         if ! answer_is_yes; then
-            dotfilesDirectory=""
-            while [ -z "$dotfilesDirectory" ]; do
+            default_dotfiles_directory=""
+            while [ -z "$default_dotfiles_directory" ]; do
                 ask "Please specify another location for the dotfiles (path): "
-                dotfilesDirectory="$(get_answer)"
+                default_dotfiles_directory="$(get_answer)"
             done
         fi
 
         # Ensure the `dotfiles` directory is available
 
-        while [ -e "$dotfilesDirectory" ]; do
-            ask_for_confirmation "'$dotfilesDirectory' already exists, do you want to overwrite it?"
+        while [ -e "$default_dotfiles_directory" ]; do
+            ask_for_confirmation "'$default_dotfiles_directory' already exists, do you want to overwrite it?"
             if answer_is_yes; then
-                rm -rf "$dotfilesDirectory"
+                rm -rf "$default_dotfiles_directory"
                 break
             else
-                dotfilesDirectory=""
-                while [ -z "$dotfilesDirectory" ]; do
+                default_dotfiles_directory=""
+                while [ -z "$default_dotfiles_directory" ]; do
                     ask "Please specify another location for the dotfiles (path): "
-                    dotfilesDirectory="$(get_answer)"
+                    default_dotfiles_directory="$(get_answer)"
                 done
             fi
         done
@@ -95,18 +95,18 @@ download_dotfiles() {
 
     else
 
-        rm -rf "$dotfilesDirectory" &> /dev/null
+        rm -rf "$default_dotfiles_directory" &> /dev/null
 
     fi
 
-    mkdir -p "$dotfilesDirectory"
-    print_result $? "Create '$dotfilesDirectory'" "true"
+    mkdir -p "$default_dotfiles_directory"
+    print_result $? "Create '$default_dotfiles_directory'" "true"
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     # Extract archive in the `dotfiles` directory.
 
-    extract "$tmpFile" "$dotfilesDirectory"
+    extract "$tmpFile" "$default_dotfiles_directory"
     print_result $? "Extract archive" "true"
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -116,7 +116,7 @@ download_dotfiles() {
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    cd "$dotfilesDirectory/src/os" \
+    cd "$default_dotfiles_directory/src/os" \
         || return 1
 
 }
@@ -155,6 +155,57 @@ extract() {
 
     return 1
 
+}
+
+remove_shebang() {
+    sed -i '' "1s;$1;;" "$2"
+}
+
+add_shebang() {
+    sed -i '' "1s;^;$1;" "$2"
+}
+
+add_shebang_recursive() {
+    local default_os_name="$1"
+    local default_shebang_regex="^#\!.*"
+    local default_usr_shebang_env="#!/usr/bin/env"
+    local exclude_files=("hushlogin" "curlrc" "fichier.txt")
+    local current_subfolder=""
+
+    # Use find to get all non-hidden files, including those from subfolders
+    find "$default_dotfiles_directory" -type f -not -name ".*" -print0 | while IFS= read -r -d '' file; do
+        # Get the subfolder name
+        subfolder_name=$(dirname "$file")
+
+        # Display the subfolder name only if it has changed
+        if [ "$subfolder_name" != "$current_subfolder" ]; then
+            if [ -n "$current_subfolder" ]; then
+                # Add a newline after processing the folder
+                printf "\n"
+            fi
+            printf "   Processing files in subfolder: %s\n" "$subfolder_name"
+            current_subfolder="$subfolder_name"
+        fi
+
+        # Check if the file is excluded
+        if [[ " ${exclude_files[@]} " =~ " $(basename "$file") " ]]; then
+            print_warning "Excluding file: $file"
+        else
+            if [ "$default_os_name" = "macos" ]; then
+                # Remove existing shebang if present
+                remove_shebang "$default_shebang_regex" "$file"
+                # Add the new shebang at the beginning of the file
+                add_shebang "$default_usr_shebang_env zsh" "$file"
+            elif [ "$default_os_name" = "ubuntu" ]; then
+                sed -i '1s;^#\!.*;;' "$file"
+                sed -i '1s;^;'"$default_usr_shebang_env bash"';' "$file"
+            else
+                return 1
+            fi
+
+            print_result $? "Add shebang to $file"
+        fi
+    done
 }
 
 verify_os() {
@@ -248,6 +299,10 @@ main() {
 
     printf "%s" "${BASH_SOURCE[0]}" | grep "setup.sh" &> /dev/null \
         || download_dotfiles
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    add_shebang_recursive "$(get_os)"
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

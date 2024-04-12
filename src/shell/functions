@@ -40,16 +40,18 @@ clone() {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 git() {
+
     if [[ $@ == "push origin master" ]]; then
         printf "Please don't push Origin Master."
     else
         command git "$@"
     fi
+
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-git-home(){
+git_home(){
 
     git rev-parse --show-toplevel
  
@@ -57,7 +59,7 @@ git-home(){
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-git-ignore(){ 
+git_ignore(){ 
 
     repo_home=$(git rev-parse --show-toplevel); \
         for filename in ${@}; do
@@ -79,6 +81,23 @@ server() {
     address="localhost"
     server_type="py"  # Default to Python http.server
 
+    help_option="
+    Usage: server [-d directory] [-p port] [-a address] [-t server_type] [-h]
+
+    Starts a server in the specified directory with optional port,
+    address, and server type.\n\n
+
+    Options:
+    -d   Directory path (default: ./)
+    -p   Port number (default: 8000)
+    -a   Address (default: localhost) or IP 127.0.0.1
+    -t   Server type: py (Python http.server), ph (PHP), js (Node.js http-server)
+    -h   Display this help message
+
+    Example:
+    server -d "~/src/index.html" -p "3000" -a "localhost" -t "js"
+    "
+
     # Parse command line options
     while getopts ":d:p:a:t:h" opt; do
         case $opt in
@@ -95,14 +114,7 @@ server() {
                 server_type="$OPTARG"
                 ;;
             h)
-                printf "Usage: %s [-d directory] [-p port] [-a address] [-t server_type] [-h]\n" "$0"
-                printf "Starts a server in the specified directory with optional port, address, and server type.\n\n"
-                printf "Options:\n"
-                printf "  -d   Directory path (default: ./)\n"
-                printf "  -p   Port number (default: 8000)\n"
-                printf "  -a   Address (default: localhost) or IP 127.0.0.1\n"
-                printf "  -t   Server type: py (Python http.server), ph (PHP), js (Node.js http-server)\n"
-                printf "  -h   Display this help message\n"
+                printf "%s\n" "$help_option"
                 exit 0
                 ;;
             \?)
@@ -164,21 +176,35 @@ server() {
 # Create data URI from a file and -l for URL.
 
 uri() {
+
     local use_openssl=false
+
+    help_option="
+    Usage: uri [-l file_path]
+
+    Create a Data URI or URL from a file.
+
+    Options:
+    -l   Use 'openssl' for base64 encoding (creates a URL).
+    -h   Display this help message.
+
+    Example:
+    uri "./fichier.txt"
+    uri -l "./fichier.txt"
+    "
 
     while getopts ":lh" opt; do
         case "$opt" in
             l ) use_openssl=true ;;
             h )
-                printf "Usage: uri [-l] <file_path>\n"
-                printf "Create a Data URI or URL from a file.\n"
-                printf "  -l   Use 'openssl' for base64 encoding (creates a URL).\n"
-                printf "  -h   Display this help message.\n"
-                return ;;
+                printf "%s\n" "$help_option"
+                return
+                ;;
             \? )
                 printf "Error: Invalid option.\n"
-                printf "Usage: uri [-l] <file_path>\n"
-                return ;;
+                printf "Usage: uri [ -l file_path ]\n"
+                return
+                ;;
         esac
     done
 
@@ -186,7 +212,7 @@ uri() {
 
     if [ $# -eq 0 ]; then
         printf "Error: No file path provided.\n"
-        printf "Usage: uri [-l] <file_path>\n"
+        printf "Usage: uri [ -l file_path ]\n"
         return
     fi
 
@@ -205,10 +231,20 @@ uri() {
 
     local base64_data
 
-    if $use_openssl; then
+    # Vérifier si openssl est disponible
+    if command -v openssl &>/dev/null; then
         base64_data=$(openssl base64 -in "$file_path" | tr -d "\n")
     else
+        printf "Error: 'openssl' command not found. Unable to create URL.\n"
+        return
+    fi
+
+    # Vérifier si base64 est disponible
+    if command -v base64 &>/dev/null; then
         base64_data=$(base64 -w 0 "$file_path")
+    else
+        printf "Error: 'base64' command not found. Unable to create Data URI.\n"
+        return
     fi
 
     if $use_openssl; then
@@ -218,15 +254,19 @@ uri() {
     fi
 
     printf "data:%s;base64,%s\n" "$mime_type" "$base64_data"
+
 }
+
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Delete files that match a certain pattern from the current directory.
 
-delete-files() {
+delete_files() {
+
     local q="${1:-*.DS_Store}"
     find . -type f -name "$q" -ls -delete
+
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -234,6 +274,7 @@ delete-files() {
 # Search history.
 
 sh() {
+
     #           ┌─ Enable colors for pipe.
     #           │  ("--color=auto" enables colors only
     #           │   if the output is in the terminal.)
@@ -241,6 +282,7 @@ sh() {
         | less --no-init --raw-control-chars
           #    │         └─ Display ANSI color escape sequences in raw form.
           #    └─ Don't clear the screen after quitting less.
+
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -251,7 +293,7 @@ sh() {
 #
 #   optimize-pdfs path/to/some/directory path/to/some/file ...
 
-optimize-pdfs() (
+optimize_pdfs() (
 
     # Check if the pdfcpu command-line tool is installed.
 
@@ -313,6 +355,7 @@ optimize-pdfs() (
              optimize-pdf "$filePath"
         fi
     done
+
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -328,7 +371,7 @@ optimize-pdfs() (
 #
 #   rename-media-files path/to/some/directory path/to/some/file ...
 
-rename-media-files() (
+rename_media_files() (
 
     rename_file() (
 
@@ -381,6 +424,121 @@ rename-media-files() (
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+# The shebang function recursively adds or replaces the shebang in files
+# within a specified directory, providing options to specify the shebang,
+# target directory, and exclude certain files from the update.
+
+shebang() {
+
+    local directory="./"
+    local shebang="#\!/usr/bin/env zsh"
+    local exclude_files=()
+    local recursive=false
+
+    help_option="
+    Usage: shebang [ -s shebang ] [ -d directory ] [ -e exclude_files ] [ -r ] [ -h ]
+        
+    The shebang function recursively adds or replaces the shebang in files
+    within a specified directory, providing options to specify the shebang,
+    target directory, and exclude certain files from the update.
+    
+    Options:
+    -s   Shebang (default: #\!/usr/bin/env zsh)
+    -d   Directory path (default: ./)
+    -e   Exclude files
+    -r   Recursively process subdirectories
+    -h   Display this help message
+    
+    Example:
+    shebang -s "#\!/usr/bin/env bash" -d "~/src/shell" -e "file1.txt, file2.sh" -r
+    "
+
+    while getopts "hrd:s:e:" opt; do
+        case $opt in
+            h)
+                printf "%s\n" "$help_option"
+                ;;
+            r)
+                recursive=true
+                ;;
+            d)
+                directory="$OPTARG"
+                ;;
+            s)
+                shebang="$OPTARG"
+                ;;
+            e)
+                IFS=', ' read -ra exclude_files <<< "$OPTARG"
+                ;;
+            \?)
+                printf "Invalid option: -%s\n" "$OPTARG" >&2
+                exit 1
+                ;;
+        esac
+    done
+
+    if [ -z "$directory" ] || [ -z "$shebang" ]; then
+        printf "Error: Missing required options. Use -h for help.\n"
+        exit 1
+    fi
+
+    if [ "$recursive" = true ]; then
+        add_shebang_recursive "$directory" "$shebang" "${exclude_files[@]}"
+    else
+        add_shebang "$directory" "$shebang" "${exclude_files[@]}"
+    fi
+
+}
+
+add_shebang() {
+
+    local directory="$1"
+    local shebang="$2"
+    local exclude_files=("${@:3}")
+
+    for file in "$directory"/*; do
+        if [ -f "$file" ]; then
+            # Check if the file is excluded
+            if [[ " ${exclude_files[@]} " =~ " $(basename "$file") " ]]; then
+                printf "Excluding file: %s\n" "$file"
+            else
+                # Remove existing shebang if present
+                sed -i '/^#!/d' "$file"
+                # Add the new shebang at the beginning of the file
+                sed -i "1s|^.*$|%s\n" "$shebang" "$file"
+            fi
+        fi
+    done
+
+}
+
+add_shebang_recursive() {
+
+    local directory="$1"
+    local shebang="$2"
+    local exclude_files=("${@:3}")
+
+    for file in "$directory"/*; do
+        if [ -f "$file" ]; then
+            # Check if the file is excluded
+            if [[ " ${exclude_files[@]} " =~ " $(basename "$file") " ]]; then
+                printf "Excluding file: %s\n" "$file"
+            else
+                # Remove existing shebang if present
+                sed -i '/^#!/d' "$file"
+                # Add the new shebang at the beginning of the file
+                sed -i "1s|^.*$|%s\n" "$shebang" "$file"
+            fi
+        elif [ -d "$file" ]; then
+            # If it's a directory, recursively call the function
+            add_shebang_recursive "$file" "$shebang" "${exclude_files[@]}"
+        fi
+    done
+
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 # Resize image.
 #
 # Create a new image based on the specified image resized by the
@@ -395,7 +553,7 @@ rename-media-files() (
 #   * resize-image ./path/to/image.jpg 30%
 #   * resize-image ./path/to/image.jpg 1000x1000!
 
-resize-image() {
+resize_image() {
 
     # Check if ImageMagick's convert command-line tool is installed.
 
@@ -614,6 +772,18 @@ fpid () {
 kpid () {
 
   pidof -k $@
+
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+display_info() {
+
+  # Run the command and store the output in a variable
+  display_info=$(system_profiler SPDisplaysDataType)
+
+  # Use awk to extract the information
+  echo "$display_info" | awk '/Resolution:/{print $0}'
 
 }
 
