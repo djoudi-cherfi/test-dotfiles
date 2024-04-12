@@ -116,11 +116,6 @@ download_dotfiles() {
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    printf "\n"
-    add_shebang_recursive "$(get_os)"
-
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
     cd "$default_dotfiles_directory/src/os" \
         || return 1
 
@@ -167,6 +162,8 @@ add_shebang_recursive() {
     local default_shebang_regex="^#\!.*"
     local default_usr_shebang_env="#!/usr/bin/env"
     local current_subfolder=""
+
+    printf "\n"
 
     # Use find to get all non-hidden files, including those from subfolders
     find "$default_dotfiles_directory" -type f \
@@ -296,6 +293,10 @@ main() {
 
     printf "%s" "${BASH_SOURCE[0]}" | grep "setup.sh" &> /dev/null \
         || download_dotfiles
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    add_shebang_recursive "$(get_os)"
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
