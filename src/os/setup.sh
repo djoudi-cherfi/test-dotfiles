@@ -157,23 +157,20 @@ extract() {
 
 }
 
-remove_shebang() {
-    sed -i '' "1s;$1;;" "$2"
-}
-
-add_shebang() {
-    sed -i '' "1s;^;$1;" "$2"
-}
-
 add_shebang_recursive() {
     local default_os_name="$1"
     local default_shebang_regex="^#\!.*"
     local default_usr_shebang_env="#!/usr/bin/env"
-    local exclude_files=("hushlogin" "curlrc" "fichier.txt")
     local current_subfolder=""
 
     # Use find to get all non-hidden files, including those from subfolders
-    find "$default_dotfiles_directory" -type f -not -name ".*" -print0 | while IFS= read -r -d '' file; do
+    find "$default_dotfiles_directory" -type f \
+    \( -not -path "*/git/*" \
+    -not -name ".*" \
+    -not -name "hushlogin" \
+    -not -name "README.md" \) \
+    -print0 | while IFS= read -r -d '' file; do
+
         # Get the subfolder name
         subfolder_name=$(dirname "$file")
 
@@ -187,24 +184,19 @@ add_shebang_recursive() {
             current_subfolder="$subfolder_name"
         fi
 
-        # Check if the file is excluded
-        if [[ " ${exclude_files[@]} " =~ " $(basename "$file") " ]]; then
-            print_warning "Excluding file: $file"
+        if [ "$default_os_name" = "macos" ]; then
+            # Remove existing shebang if present
+            sed -i '' "1s;$default_shebang_regex;;" "$file"
+            # Add the new shebang at the beginning of the file
+            sed -i '' "1s;^;$default_usr_shebang_env zsh;" "$file"
+        elif [ "$default_os_name" = "ubuntu" ]; then
+            sed -i "1s;$default_shebang_regex;;" "$file"
+            sed -i "1s;^;$default_usr_shebang_env bash;" "$file"
         else
-            if [ "$default_os_name" = "macos" ]; then
-                # Remove existing shebang if present
-                remove_shebang "$default_shebang_regex" "$file"
-                # Add the new shebang at the beginning of the file
-                add_shebang "$default_usr_shebang_env zsh" "$file"
-            elif [ "$default_os_name" = "ubuntu" ]; then
-                sed -i '1s;^#\!.*;;' "$file"
-                sed -i '1s;^;'"$default_usr_shebang_env bash"';' "$file"
-            else
-                return 1
-            fi
-
-            print_result $? "Add shebang to $file"
+            return 1
         fi
+
+        print_result $? "Add shebang to $file"
     done
 }
 
@@ -306,7 +298,7 @@ main() {
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    ./create_symbolic_links.sh "$@"
+    # ./create_symbolic_links.sh "$@"
 
     # # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
