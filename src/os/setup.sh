@@ -157,7 +157,7 @@ extract() {
 
 }
 
-add_shebang_recursive() {
+update_shebang() {
     local default_os_name="$1"
     local default_shebang_regex="^#\!.*"
     local default_usr_shebang_env="#!/usr/bin/env"
@@ -297,7 +297,7 @@ main() {
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    add_shebang_recursive "$(get_os)"
+    update_shebang "$(get_os)"
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -305,37 +305,37 @@ main() {
 
     # # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    # ./create_local_config_files.sh
+    ./create_local_config_files.sh
 
     # # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    # ./installs/main.sh
+    ./installs/main.sh
 
     # # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    # ./preferences/main.sh
+    ./preferences/main.sh
 
     # # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    # if cmd_exists "git"; then
+    if cmd_exists "git"; then
 
-    #     if [ "$(git config --get remote.origin.url)" != "$DOTFILES_ORIGIN" ]; then
-    #         ./initialize_git_repository.sh "$DOTFILES_ORIGIN"
-    #     fi
+        if [ "$(git config --get remote.origin.url)" != "$DOTFILES_ORIGIN" ]; then
+            ./initialize_git_repository.sh "$DOTFILES_ORIGIN"
+        fi
 
-    #     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    #     if ! $skipQuestions; then
-    #         ./update_content.sh
-    #     fi
+        if ! $skipQuestions; then
+            ./update_content.sh
+        fi
 
-    # fi
+    fi
 
     # # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    # if ! $skipQuestions; then
-    #     ./restart.sh
-    # fi
+    if ! $skipQuestions; then
+        ./restart.sh
+    fi
 
 }
 
