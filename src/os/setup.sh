@@ -168,6 +168,7 @@ add_shebang_recursive() {
     # Use find to get all non-hidden files, including those from subfolders
     find "$default_dotfiles_directory" -type f \
     \( -not -path "*/git/*" \
+    -not -path "*/os/*" \
     -not -name ".*" \
     -not -name "hushlogin" \
     -not -name "README.md" \) \
